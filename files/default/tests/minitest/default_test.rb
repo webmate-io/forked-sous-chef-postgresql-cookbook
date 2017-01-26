@@ -1,6 +1,5 @@
 #
-# Cookbook Name:: postgresql
-# Recipe:: server
+# Copyright 2012, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,20 +14,14 @@
 # limitations under the License.
 #
 
-change_notify = node['postgresql']['server']['config_change_notify']
+require File.expand_path('../support/helpers', __FILE__)
 
-template "#{node['postgresql']['dir']}/postgresql.conf" do
-  source "postgresql.conf.erb"
-  owner "postgres"
-  group "postgres"
-  mode 0600
-  notifies change_notify, 'service[postgresql]', :immediately
-end
+describe 'postgresql::default' do
+  include Helpers::Postgresql
 
-template "#{node['postgresql']['dir']}/pg_hba.conf" do
-  source "pg_hba.conf.erb"
-  owner "postgres"
-  group "postgres"
-  mode 00600
-  notifies change_notify, 'service[postgresql]', :immediately
+  it 'installs the postgresql client packages' do
+    node['postgresql']['client']['packages'].each do |pkg|
+      package(pkg).must_be_installed
+    end
+  end
 end

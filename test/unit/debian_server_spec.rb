@@ -2,32 +2,36 @@ require 'spec_helper'
 
 describe 'debian::postgresql::server' do
   let(:chef_application) do
-    double('Chef::Application', fatal!: false)
+    double('Chef::Application',fatal!:false);
   end
   let(:chef_run) do
-    runner = ChefSpec::ServerRunner.new(
-      platform: 'debian', version: '7.11'
+    runner = ChefSpec::SoloRunner.new(
+      platform: 'debian', version: '7.4'
     ) do |node|
       node.automatic['memory']['total'] = '2048kB'
       node.automatic['ipaddress'] = '1.1.1.1'
-      node.default['postgresql']['version'] = '9.1'
-      node.default['postgresql']['password']['postgres'] = 'password'
+      node.set['postgresql']['version'] = '9.1'
+      node.set['postgresql']['password']['postgres'] = 'password'
     end
     runner.converge('postgresql::server')
   end
   before do
-    stub_const('Chef::Application', chef_application)
+    stub_const('Chef::Application',chef_application)
     allow(File).to receive(:directory?).and_call_original
     allow(File).to receive(:directory?).with('/etc/postgresql/9.1/main').and_return(false)
-    stub_command('ls /var/lib/postgresql/9.1/main/recovery.conf').and_return(false)
+    stub_command("ls /var/lib/postgresql/9.1/main/recovery.conf").and_return(false)
   end
 
   it 'Install postgresql 9.1' do
     expect(chef_run).to install_package('postgresql-9.1')
   end
 
-  it 'Install postgresql 9.1 client and dev packages' do
-    expect(chef_run).to install_package(['postgresql-client-9.1', 'libpq-dev'])
+  it 'Install postgresql 9.1 client' do
+    expect(chef_run).to install_package('postgresql-client-9.1')
+  end
+
+  it 'Install postgresql 9.1 dev files' do
+    expect(chef_run).to install_package('libpq-dev')
   end
 
   it 'Enable and start service postgresql' do
@@ -46,7 +50,7 @@ describe 'debian::postgresql::server' do
 
   context 'when running as a standby host' do
     it 'does not assign the Postgres password' do
-      stub_command('ls /var/lib/postgresql/9.1/main/recovery.conf').and_return(false)
+      stub_command("ls /var/lib/postgresql/9.1/main/recovery.conf").and_return(false)
       expect(chef_run).to_not run_bash('assign_postgres_password')
     end
   end
