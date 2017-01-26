@@ -27,6 +27,9 @@ include_recipe "postgresql::server_conf"
 
 service "postgresql" do
   service_name node['postgresql']['server']['service_name']
+  restart_command "/etc/init.d/postgresql restart #{node['postgresql']['version']}"
+  start_command "/etc/init.d/postgresql start #{node['postgresql']['version']}"
+  stop_command "/etc/init.d/postgresql stop #{node['postgresql']['version']}"
   supports :restart => true, :status => true, :reload => true
   action [:enable, :start]
 end

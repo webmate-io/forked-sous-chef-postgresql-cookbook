@@ -234,15 +234,15 @@ end
 
 # (6) checkpoint_segments
 #     Sets the maximum distance in log segments between automatic WAL checkpoints.
-checkpoint_segments =
-{ "web" => 8,
-  "oltp" => 16,
-  "dw" => 64,
-  "mixed" => 16,
-  "desktop" => 3
-}.fetch(db_type)
+#checkpoint_segments =
+#{ "web" => 8,
+#  "oltp" => 16,
+#  "dw" => 64,
+#  "mixed" => 16,
+#  "desktop" => 3
+#}.fetch(db_type)
 
-node.default['postgresql']['config']['checkpoint_segments'] = checkpoint_segments
+#node.default['postgresql']['config']['checkpoint_segments'] = checkpoint_segments
 
 # (7) checkpoint_completion_target
 #     Time spent flushing dirty buffers during checkpoint, as fraction
